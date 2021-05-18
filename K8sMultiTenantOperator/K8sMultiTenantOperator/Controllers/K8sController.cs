@@ -77,7 +77,7 @@ namespace K8sMultiTenantOperator.Controllers
 
         }
 
-        /// <summary>CreateNamespaceAsync - Creates a Namespace within the K8s cluster asynchronously</summary>        
+        /// <summary>CreateNamespaceAsync - Creates Namespace within the K8s cluster asynchronously</summary>        
         /// <param name="groupName">
         /// Represents Namespace name within the k8s cluster
         /// The actual Namespace name will be <c>groupName-ns</c>        
@@ -98,14 +98,14 @@ namespace K8sMultiTenantOperator.Controllers
             
         }
 
-        /// <summary>DeleteNamespaceAsync - Deletes a Namespace from the K8s cluster asynchronously</summary>        
+        /// <summary>DeleteNamespaceAsync - Deletes Namespace from the K8s cluster asynchronously</summary>        
         /// <param name="groupName">
         /// Represents Namespace name within the k8s cluster
         /// The actual Namespace name will be <c>groupName-ns</c>        
         /// </param>        
         /// <example>http://localhost:7070/groups/{groupName}</example>
         [HttpDelete]
-        [Route("groups/{groupName}")]
+        [Route("groups/{groupName}", Name = "DeleteNamespace")]
         public async Task<IActionResult> DeleteNamespaceAsync([FromRoute] string groupName)
         {
 
@@ -119,14 +119,13 @@ namespace K8sMultiTenantOperator.Controllers
 
         }
 
-        /// <summary>CreateDeploymentAsync - Creates a Deploymnet in the K8s cluster asynchronously</summary>        
+        /// <summary>CreateDeploymentAsync - Creates Deploymnet in the K8s cluster asynchronously</summary>        
         /// <param name="deployBody">
-        /// Represents Deployment model as sent in the Request body
-        /// The actual Deployment model will be <c>deployname-deploy</c>        
+        /// Represents Deployment model as sent in the Request body        
         /// </param>
         /// <param name="deployName">
         /// Represents Deployment name within the k8s cluster
-        /// The actual Deployment name will be <c>groupName-ns</c>        
+        /// The actual Deployment name will be <c>deployname-deploy</c>        
         /// </param>
         /// <param name="groupName">
         /// Represents Namespace name within the k8s cluster
@@ -158,14 +157,13 @@ namespace K8sMultiTenantOperator.Controllers
 
         }
 
-        /// <summary>PatchDeploymentAsync - Deletes a Namespace from the K8s cluster asynchronously</summary>        
+        /// <summary>PatchDeploymentAsync - Patches Deployment in the K8s cluster asynchronously</summary>        
         /// <param name="deployBody">
-        /// Represents Deployment model as sent in the Request body
-        /// The actual Deployment model will be <c>deployname-deploy</c>        
+        /// Represents Deployment model as sent in the Request body        
         /// </param>
         /// <param name="deployName">
         /// Represents Deployment name within the k8s cluster
-        /// The actual Deployment name will be <c>groupName-ns</c>        
+        /// The actual Deployment name will be <c>deployname-deploy</c>        
         /// </param>
         /// <param name="groupName">
         /// Represents Namespace name within the k8s cluster
@@ -190,6 +188,19 @@ namespace K8sMultiTenantOperator.Controllers
 
         }
 
+        /// <summary>PatchDeploymentAsync - Deletes Deployment from the K8s cluster asynchronously</summary>        
+        /// <param name="deployBody">
+        /// Represents Deployment model as sent in the Request body        
+        /// </param>
+        /// <param name="deployName">
+        /// Represents Deployment name within the k8s cluster
+        /// The actual Deployment name will be <c>deployname-deploy</c>        
+        /// </param>
+        /// <param name="groupName">
+        /// Represents Namespace name within the k8s cluster
+        /// The actual Namespace name will be <c>groupName-ns</c>        
+        /// </param> 
+        /// <example>http://localhost:7070/deploy/{deployName}/groups/{groupName}</example>
         [HttpDelete]
         [Route("deploy/{deployName}/groups/{groupName}", Name = "DeleteDeployment")]
         public async Task<IActionResult> DeleteDeploymentAsync
@@ -207,6 +218,19 @@ namespace K8sMultiTenantOperator.Controllers
 
         }
 
+        /// <summary>CreateServiceAsync - Creates Service in the K8s cluster asynchronously</summary>        
+        /// <param name="serviceBody">
+        /// Represents Service model as sent in the Request body        
+        /// </param>
+        /// <param name="serviceName">
+        /// Represents Service name within the k8s cluster
+        /// The actual Service name will be <c>serviceName-svc</c>        
+        /// </param>
+        /// <param name="groupName">
+        /// Represents Namespace name within the k8s cluster
+        /// The actual Namespace name will be <c>groupName-ns</c>        
+        /// </param> 
+        /// <example>http://localhost:7070/service/{serviceName}/groups/{groupName}</example>
         [HttpPut]
         [Route("service/{serviceName}/groups/{groupName}", Name = "CreateService")]
         public async Task<IActionResult> CreateServiceAsync
@@ -230,8 +254,18 @@ namespace K8sMultiTenantOperator.Controllers
             return Created(Url.RouteUrl("CreateService", new { serviceName, groupName }),
                                         respondeModel.Item1);
 
-        }        
+        }
 
+        /// <summary>DeleteServiceAsync - Deletes Service from the K8s cluster asynchronously</summary>                
+        /// <param name="serviceName">
+        /// Represents Service name within the k8s cluster
+        /// The actual Service name will be <c>serviceName-svc</c>        
+        /// </param>
+        /// <param name="groupName">
+        /// Represents Namespace name within the k8s cluster
+        /// The actual Namespace name will be <c>groupName-ns</c>        
+        /// </param> 
+        /// <example>http://localhost:7070/service/{serviceName}/groups/{groupName}</example>
         [HttpDelete]
         [Route("service/{serviceName}/groups/{groupName}", Name = "DeleteService")]
         public async Task<IActionResult> DeleteServiceAsync
@@ -249,8 +283,21 @@ namespace K8sMultiTenantOperator.Controllers
 
         }
 
+        /// <summary>DeleteServiceAsync - Deletes Service from the K8s cluster asynchronously</summary>
+        /// <param name="hpaBody">
+        /// Represents HPA sent as Request body
+        /// </param>
+        /// <param name="hpaName">
+        /// Represents HPA name within the k8s cluster
+        /// The actual HPA name will be <c>hpaName-hpa</c>        
+        /// </param>
+        /// <param name="groupName">
+        /// Represents Namespace name within the k8s cluster
+        /// The actual Namespace name will be <c>groupName-ns</c>        
+        /// </param> 
+        /// <example>http://localhost:7070/hpa/{hpaName}/groups/{groupName}</example>
         [HttpPut]
-        [Route("hpa/{hpaName}/groups/{groupName}", Name = "CreateService")]
+        [Route("hpa/{hpaName}/groups/{groupName}", Name = "CreateHPA")]
         public async Task<IActionResult> CreateHPAAsync
                                          ([FromBody] MTAHPAModel hpaBody,
                                          [FromRoute] string hpaName,
@@ -275,8 +322,18 @@ namespace K8sMultiTenantOperator.Controllers
 
         }
 
+        /// <summary>DeleteServiceAsync - Deletes Service from the K8s cluster asynchronously</summary>        
+        /// <param name="hpaName">
+        /// Represents HPA name within the k8s cluster
+        /// The actual HPA name will be <c>hpaName-hpa</c>        
+        /// </param>
+        /// <param name="groupName">
+        /// Represents Namespace name within the k8s cluster
+        /// The actual Namespace name will be <c>groupName-ns</c>        
+        /// </param> 
+        /// <example>http://localhost:7070/hpa/{hpaName}/groups/{groupName}</example>
         [HttpDelete]
-        [Route("service/{serviceName}/groups/{groupName}", Name = "DeleteService")]
+        [Route("hpa/{hpaName}/groups/{groupName}", Name = "DeleteHPA")]
         public async Task<IActionResult> DeleteHPAAsync
                                         ([FromRoute] string hpaName,
                                         [FromRoute] string groupName)
