@@ -11,10 +11,10 @@ namespace K8sMultiTenantOperator.Controllers
         protected const string kServiceTokenString = "-svc";
         protected const string kHPATokenString = "-hpa";
 
+        protected string _tenantName;
         protected string _groupName;
 
         protected string PrepareNamespaceParams(string groupName)
-
         {
 
             var namespaceNameString = string.Concat(groupName, kNamespaceTokenString);
@@ -23,10 +23,9 @@ namespace K8sMultiTenantOperator.Controllers
         }      
 
         protected Tuple<string, string, string> PrepareDeployParams(string deployName)
-
         {
 
-            var deployNameString = string.Concat(deployName, kDeployTokenString);
+            var deployNameString = string.Concat(deployName, _tenantName, kDeployTokenString);
             var podNameString = string.Concat(deployName, kPodTokenString);
             var containerNameString = string.Concat(deployName, kContainerTokenString);
 
@@ -35,10 +34,9 @@ namespace K8sMultiTenantOperator.Controllers
         }
 
         protected Tuple<string, string> PrepareHPAParams(string hpaName, string deployName)
-
         {
 
-            var hpaNameString = string.Concat(hpaName, kHPATokenString);
+            var hpaNameString = string.Concat(hpaName, _tenantName, kHPATokenString);
             var deployNameString = string.Concat(deployName, kDeployTokenString);
 
             return new Tuple<string, string>(deployNameString, hpaNameString);
@@ -46,17 +44,17 @@ namespace K8sMultiTenantOperator.Controllers
         }
 
         protected string PrepareServiceParams(string serviceName)
-
         {
             
-            var serviceNameString = string.Concat(serviceName, kServiceTokenString);
+            var serviceNameString = string.Concat(serviceName, _tenantName, kServiceTokenString);
             return serviceNameString;
 
         }
 
-        public MTAController(string groupName)
+        public MTAController(string tenantName, string groupName)
         {
 
+            _tenantName = tenantName;
             _groupName = groupName;
 
         }

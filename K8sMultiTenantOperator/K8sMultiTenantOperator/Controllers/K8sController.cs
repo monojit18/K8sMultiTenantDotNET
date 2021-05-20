@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Rest;
@@ -18,7 +19,7 @@ namespace K8sMultiTenantOperator.Controllers
 {
 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("/")]
     public class K8sController : ControllerBase
     {
 
@@ -85,6 +86,8 @@ namespace K8sMultiTenantOperator.Controllers
         /// <example>http://localhost:7070/groups/{groupName}</example>
         [HttpPut]
         [Route("groups/{groupName}", Name = "CreateNamespace")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateNamespaceAsync([FromRoute] string groupName)
         {
 
@@ -102,10 +105,12 @@ namespace K8sMultiTenantOperator.Controllers
         /// <param name="groupName">
         /// Represents Namespace name within the k8s cluster
         /// The actual Namespace name will be <c>groupName-ns</c>        
-        /// </param>        
+        /// </param>              
         /// <example>http://localhost:7070/groups/{groupName}</example>
         [HttpDelete]
         [Route("groups/{groupName}", Name = "DeleteNamespace")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteNamespaceAsync([FromRoute] string groupName)
         {
 
@@ -133,19 +138,21 @@ namespace K8sMultiTenantOperator.Controllers
         /// </param> 
         /// <example>http://localhost:7070/deploy/{deployName}/groups/{groupName}</example>
         [HttpPut]
-        [Route("deploy/{deployName}/groups/{groupName}", Name = "CreateDeployment")]
+        [Route("deploy/{deployName}/tenant/{tenantName}/groups/{groupName}", Name = "CreateDeployment")]
+        [ProducesResponseType(typeof(MTADeployModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateDeploymentAsync
                                          ([FromBody] MTADeployModel deployBody,
-                                         [FromRoute] string deployName,
-                                         [FromRoute] string groupName)
+                                          [FromRoute] string deployName,
+                                          [FromRoute] string tenantName,
+                                          [FromRoute] string groupName)
         {
-
 
             var path = string.Concat(GetTemplatesPath(), "/template-deploy.yaml");
             var deploymentsList = await Yaml.LoadAllFromFileAsync(path);
 
             var yamlBody = deploymentsList[0] as V1Deployment;
-            var deployController = new MTADeployController(deployName, groupName);
+            var deployController = new MTADeployController(deployName, tenantName, groupName);
             var respondeModel = await deployController.CreateDeploymentAsync
                                                        (_k8sClient, yamlBody, deployBody);
 
@@ -172,19 +179,22 @@ namespace K8sMultiTenantOperator.Controllers
         /// <example>http://localhost:7070/deploy/{deployName}/groups/{groupName}</example>
         [HttpPatch]
         [Route("deploy/{deployName}/groups/{groupName}", Name = "PatchDeployment")]
+        [ProducesResponseType(typeof(MTADeployModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PatchDeploymentAsync
                                         ([FromBody] MTADeployModel patchBody,
                                          [FromRoute] string deployName,
+                                         [FromRoute] string tenantName,
                                          [FromRoute] string groupName)
         {
 
-            var deployController = new MTADeployController(deployName, groupName);            
+            var deployController = new MTADeployController(deployName, tenantName, groupName);            
             var respondeModel = await deployController.PatchDeploymentAsync(_k8sClient, patchBody);
 
             if (respondeModel != null)
                 return BadRequest(respondeModel);
 
-            return NoContent();
+            return Ok(respondeModel.Item1);
 
         }
 
@@ -203,12 +213,15 @@ namespace K8sMultiTenantOperator.Controllers
         /// <example>http://localhost:7070/deploy/{deployName}/groups/{groupName}</example>
         [HttpDelete]
         [Route("deploy/{deployName}/groups/{groupName}", Name = "DeleteDeployment")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteDeploymentAsync
                                         ([FromRoute] string deployName,
-                                        [FromRoute] string groupName)
+                                         [FromRoute] string tenantName,
+                                         [FromRoute] string groupName)
         {
 
-            var deployController = new MTADeployController(deployName, groupName);
+            var deployController = new MTADeployController(deployName, tenantName, groupName);
             var respondeModel = await deployController.DeleteDeploymentAsync(_k8sClient);
 
             if (respondeModel != null)
@@ -233,9 +246,12 @@ namespace K8sMultiTenantOperator.Controllers
         /// <example>http://localhost:7070/service/{serviceName}/groups/{groupName}</example>
         [HttpPut]
         [Route("service/{serviceName}/groups/{groupName}", Name = "CreateService")]
+        [ProducesResponseType(typeof(MTAServiceModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateServiceAsync
                                          ([FromBody] MTAServiceModel serviceBody,
                                          [FromRoute] string serviceName,
+                                         [FromRoute] string tenantName,
                                          [FromRoute] string groupName)
         {
 
@@ -244,7 +260,7 @@ namespace K8sMultiTenantOperator.Controllers
             var servicesList = await Yaml.LoadAllFromFileAsync(path);
 
             var yamlBody = servicesList[0] as V1Service;
-            var serviceController = new MTAServiceController(serviceName, groupName);
+            var serviceController = new MTAServiceController(serviceName, tenantName, groupName);
             var respondeModel = await serviceController.CreateServiceAsync
                                                        (_k8sClient, yamlBody, serviceBody);
 
@@ -268,12 +284,15 @@ namespace K8sMultiTenantOperator.Controllers
         /// <example>http://localhost:7070/service/{serviceName}/groups/{groupName}</example>
         [HttpDelete]
         [Route("service/{serviceName}/groups/{groupName}", Name = "DeleteService")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteServiceAsync
                                         ([FromRoute] string serviceName,
-                                        [FromRoute] string groupName)
+                                         [FromRoute] string tenantName,
+                                         [FromRoute] string groupName)
         {
 
-            var serviceController = new MTAServiceController(serviceName, groupName);
+            var serviceController = new MTAServiceController(serviceName, tenantName, groupName);
             var respondeModel = await serviceController.DeleteServiceAsync(_k8sClient);
 
             if (respondeModel != null)
@@ -298,9 +317,12 @@ namespace K8sMultiTenantOperator.Controllers
         /// <example>http://localhost:7070/hpa/{hpaName}/groups/{groupName}</example>
         [HttpPut]
         [Route("hpa/{hpaName}/groups/{groupName}", Name = "CreateHPA")]
+        [ProducesResponseType(typeof(MTAHPAModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateHPAAsync
                                          ([FromBody] MTAHPAModel hpaBody,
                                          [FromRoute] string hpaName,
+                                         [FromRoute] string tenantName,
                                          [FromRoute] string groupName)
         {
 
@@ -310,7 +332,7 @@ namespace K8sMultiTenantOperator.Controllers
 
             var yamlBody = hpaList[0] as V1HorizontalPodAutoscaler;
             var deployName = hpaBody.DeploymentName;
-            var hpaController = new MTAHPAController(hpaName, deployName, groupName);
+            var hpaController = new MTAHPAController(hpaName, deployName, tenantName, groupName);
             var respondeModel = await hpaController.CreateHPAAsync
                                                     (_k8sClient, yamlBody, hpaBody);
 
@@ -334,12 +356,15 @@ namespace K8sMultiTenantOperator.Controllers
         /// <example>http://localhost:7070/hpa/{hpaName}/groups/{groupName}</example>
         [HttpDelete]
         [Route("hpa/{hpaName}/groups/{groupName}", Name = "DeleteHPA")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteHPAAsync
                                         ([FromRoute] string hpaName,
-                                        [FromRoute] string groupName)
+                                         [FromRoute] string tenantName,
+                                         [FromRoute] string groupName)
         {
 
-            var serviceController = new MTAHPAController(hpaName, string.Empty, groupName);
+            var serviceController = new MTAHPAController(hpaName, string.Empty, tenantName, groupName);
             var respondeModel = await serviceController.DeleteHPAAsync(_k8sClient);
 
             if (respondeModel != null)

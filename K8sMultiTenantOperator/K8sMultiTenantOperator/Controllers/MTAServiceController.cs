@@ -28,7 +28,8 @@ namespace K8sMultiTenantOperator.Controllers
         /// Represents Namespace name within the k8s cluster
         /// The actual Namespace name will be <c>groupName-ns</c>        
         /// </param> 
-        public MTAServiceController(string serviceName, string groupName) : base(groupName)
+        public MTAServiceController(string serviceName, string tenantName, string groupName)
+            : base(tenantName, groupName)
         {
 
             _serviceName = serviceName;            
@@ -42,7 +43,7 @@ namespace K8sMultiTenantOperator.Controllers
         /// Responsible for connecting to K8s cluster        
         /// </param>        
         /// <returns>
-        /// a Tuple - Tuple<MTAServiceModel, MTAErrorModel>
+        /// Tuple<MTAServiceModel, MTAErrorModel>
         /// eithher Error or Deploy model is returned
         /// </returns>
         public async Task<Tuple<MTAServiceModel, MTAErrorModel>>
@@ -88,7 +89,7 @@ namespace K8sMultiTenantOperator.Controllers
         /// MTAServiceModel as sent in Request Body
         /// </param>
         /// <returns>
-        /// a Tuple - Tuple<MTAServiceModel, MTAErrorModel>
+        /// Tuple<MTAServiceModel, MTAErrorModel>
         /// eithher Error or Service model is returned
         /// </returns>
         public async Task<Tuple<MTAServiceModel, MTAErrorModel>>

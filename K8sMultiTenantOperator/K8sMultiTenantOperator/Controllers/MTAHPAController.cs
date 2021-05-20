@@ -33,7 +33,8 @@ namespace K8sMultiTenantOperator.Controllers
         /// Represents Namespace name within the k8s cluster
         /// The actual Namespace name will be <c>groupName-ns</c>        
         /// </param> 
-        public MTAHPAController(string hpaName, string deployName, string groupName) : base(groupName)
+        public MTAHPAController(string hpaName, string deployName, string tenantName, string groupName)
+            : base(tenantName, groupName)
         {
 
             _hpaName = hpaName;
@@ -48,7 +49,7 @@ namespace K8sMultiTenantOperator.Controllers
         /// Responsible for connecting to K8s cluster        
         /// </param>        
         /// <returns>
-        /// a Tuple - Tuple<MTAHPAModel, MTAErrorModel>
+        /// Tuple<MTAHPAModel, MTAErrorModel>
         /// eithher Error or HPA model is returned
         /// </returns>
         public async Task<Tuple<MTAHPAModel, MTAErrorModel>>
@@ -95,7 +96,7 @@ namespace K8sMultiTenantOperator.Controllers
         /// MTAHPAModel as sent in Request Body
         /// </param>
         /// <returns>
-        /// a Tuple - Tuple<MTAHPAModel, MTAErrorModel>
+        /// Tuple<MTAHPAModel, MTAErrorModel>
         /// eithher Error or Deploy model is returned
         /// </returns>
         public async Task<Tuple<MTAHPAModel, MTAErrorModel>>

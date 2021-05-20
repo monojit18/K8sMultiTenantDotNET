@@ -28,7 +28,8 @@ namespace K8sMultiTenantOperator.Controllers
         /// Represents Namespace name within the k8s cluster
         /// The actual Namespace name will be <c>groupName-ns</c>        
         /// </param>
-        public MTADeployController(string deployName, string groupName) : base(groupName)
+        public MTADeployController(string deployName, string tenantName, string groupName)
+            : base(tenantName, groupName)
         {
 
             _deployName = deployName;
@@ -42,7 +43,7 @@ namespace K8sMultiTenantOperator.Controllers
         /// Responsible for connecting to K8s cluster        
         /// </param>        
         /// <returns>
-        /// a Tuple - Tuple<MTADeployModel, MTAErrorModel>
+        /// Tuple<MTADeployModel, MTAErrorModel>
         /// eithher Error or Deploy model is returned
         /// </returns>
         public async Task<Tuple<MTADeployModel, MTAErrorModel>>
@@ -88,7 +89,7 @@ namespace K8sMultiTenantOperator.Controllers
         /// MTADeployModel as sent in Request Body
         /// </param>
         /// <returns>
-        /// a Tuple - Tuple<MTADeployModel, MTAErrorModel>
+        /// Tuple<MTADeployModel, MTAErrorModel>
         /// eithher Error or Deploy model is returned
         /// </returns>
         public async Task<Tuple<MTADeployModel, MTAErrorModel>>
@@ -173,7 +174,7 @@ namespace K8sMultiTenantOperator.Controllers
         /// MTADeployModel as sent in Request Body
         /// </param>        
         /// <returns>
-        /// a Tuple - Tuple<MTADeployModel, MTAErrorModel>
+        /// Tuple<MTADeployModel, MTAErrorModel>
         /// eithher Error or Deploy model is returned
         /// </returns>
         public async Task<Tuple<MTADeployModel, MTAErrorModel>>
