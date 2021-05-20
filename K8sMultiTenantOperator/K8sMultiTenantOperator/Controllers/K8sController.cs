@@ -178,7 +178,7 @@ namespace K8sMultiTenantOperator.Controllers
         /// </param> 
         /// <example>http://localhost:7070/deploy/{deployName}/groups/{groupName}</example>
         [HttpPatch]
-        [Route("deploy/{deployName}/groups/{groupName}", Name = "PatchDeployment")]
+        [Route("deploy/{deployName}/tenant/{tenantName}/groups/{groupName}", Name = "PatchDeployment")]
         [ProducesResponseType(typeof(MTADeployModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PatchDeploymentAsync
@@ -212,7 +212,7 @@ namespace K8sMultiTenantOperator.Controllers
         /// </param> 
         /// <example>http://localhost:7070/deploy/{deployName}/groups/{groupName}</example>
         [HttpDelete]
-        [Route("deploy/{deployName}/groups/{groupName}", Name = "DeleteDeployment")]
+        [Route("deploy/{deployName}/tenant/{tenantName}/groups/{groupName}", Name = "DeleteDeployment")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteDeploymentAsync
@@ -245,7 +245,7 @@ namespace K8sMultiTenantOperator.Controllers
         /// </param> 
         /// <example>http://localhost:7070/service/{serviceName}/groups/{groupName}</example>
         [HttpPut]
-        [Route("service/{serviceName}/groups/{groupName}", Name = "CreateService")]
+        [Route("service/{serviceName}/tenant/{tenantName}/groups/{groupName}", Name = "CreateService")]
         [ProducesResponseType(typeof(MTAServiceModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateServiceAsync
@@ -283,7 +283,7 @@ namespace K8sMultiTenantOperator.Controllers
         /// </param> 
         /// <example>http://localhost:7070/service/{serviceName}/groups/{groupName}</example>
         [HttpDelete]
-        [Route("service/{serviceName}/groups/{groupName}", Name = "DeleteService")]
+        [Route("service/{serviceName}/tenant/{tenantName}/groups/{groupName}", Name = "DeleteService")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteServiceAsync
@@ -316,7 +316,7 @@ namespace K8sMultiTenantOperator.Controllers
         /// </param> 
         /// <example>http://localhost:7070/hpa/{hpaName}/groups/{groupName}</example>
         [HttpPut]
-        [Route("hpa/{hpaName}/groups/{groupName}", Name = "CreateHPA")]
+        [Route("hpa/{hpaName}/tenant/{tenantName}/groups/{groupName}", Name = "CreateHPA")]
         [ProducesResponseType(typeof(MTAHPAModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateHPAAsync
@@ -355,7 +355,7 @@ namespace K8sMultiTenantOperator.Controllers
         /// </param> 
         /// <example>http://localhost:7070/hpa/{hpaName}/groups/{groupName}</example>
         [HttpDelete]
-        [Route("hpa/{hpaName}/groups/{groupName}", Name = "DeleteHPA")]
+        [Route("hpa/{hpaName}/tenant/{tenantName}/groups/{groupName}", Name = "DeleteHPA")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteHPAAsync
