@@ -124,13 +124,49 @@ namespace K8sMultiTenantOperator.Controllers
 
         }
 
+        /// <summary>GetDeploymentAsync - Creates Deploymnet in the K8s cluster asynchronously</summary>                
+        /// <param name="deployName">
+        /// Represents Deployment name within the k8s cluster
+        /// The actual Deployment name will be <c>deployname-tenantName-deploy</c>        
+        /// </param>
+        /// <param name="tenantName">
+        /// Represents Tenant name
+        /// </param>
+        /// <param name="groupName">
+        /// Represents Namespace name within the k8s cluster
+        /// The actual Namespace name will be <c>groupName-ns</c>        
+        /// </param> 
+        /// <example>http://localhost:7070/deploy/{deployName}/groups/{groupName}</example>
+        [HttpGet]
+        [Route("deploy/{deployName}/tenant/{tenantName}/groups/{groupName}", Name = "CreateDeployment")]
+        [ProducesResponseType(typeof(MTADeployModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MTAErrorModel), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetDeploymentAsync
+                                         ([FromRoute] string deployName,
+                                          [FromRoute] string tenantName,
+                                          [FromRoute] string groupName)
+        {
+            
+            var deployController = new MTADeployController(deployName, tenantName, groupName);
+            var respondeModel = await deployController.ReadDeploymentAsync(_k8sClient);
+
+            if (respondeModel.Item2 != null)
+                return BadRequest(respondeModel.Item2);
+
+            return Ok(respondeModel.Item1);
+
+        }
+
         /// <summary>CreateDeploymentAsync - Creates Deploymnet in the K8s cluster asynchronously</summary>        
         /// <param name="deployBody">
         /// Represents Deployment model as sent in the Request body        
         /// </param>
         /// <param name="deployName">
         /// Represents Deployment name within the k8s cluster
-        /// The actual Deployment name will be <c>deployname-deploy</c>        
+        /// The actual Deployment name will be <c>deployname-tenantName-deploy</c>        
+        /// </param>
+        /// <param name="tenantName">
+        /// Represents Tenant name
         /// </param>
         /// <param name="groupName">
         /// Represents Namespace name within the k8s cluster

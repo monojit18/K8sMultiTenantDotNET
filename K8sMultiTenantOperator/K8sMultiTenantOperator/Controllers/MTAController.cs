@@ -25,9 +25,9 @@ namespace K8sMultiTenantOperator.Controllers
         protected Tuple<string, string, string> PrepareDeployParams(string deployName)
         {
 
-            var deployNameString = string.Concat(deployName, _tenantName, kDeployTokenString);
-            var podNameString = string.Concat(deployName, kPodTokenString);
-            var containerNameString = string.Concat(deployName, kContainerTokenString);
+            var deployNameString = $"{deployName}-{_tenantName}{kDeployTokenString}";
+            var podNameString = $"{deployName}{kDeployTokenString}";
+            var containerNameString = $"{deployName}{kContainerTokenString}";
 
             return new Tuple<string, string, string>
                        (deployNameString, podNameString, containerNameString);
@@ -36,8 +36,8 @@ namespace K8sMultiTenantOperator.Controllers
         protected Tuple<string, string> PrepareHPAParams(string hpaName, string deployName)
         {
 
-            var hpaNameString = string.Concat(hpaName, _tenantName, kHPATokenString);
-            var deployNameString = string.Concat(deployName, kDeployTokenString);
+            var hpaNameString = $"{hpaName}-{_tenantName}{kHPATokenString}";
+            var deployNameString = $"{deployName}{kDeployTokenString}";
 
             return new Tuple<string, string>(deployNameString, hpaNameString);
 
@@ -45,8 +45,8 @@ namespace K8sMultiTenantOperator.Controllers
 
         protected string PrepareServiceParams(string serviceName)
         {
-            
-            var serviceNameString = string.Concat(serviceName, _tenantName, kServiceTokenString);
+
+            var serviceNameString = $"{serviceName}-{_tenantName}{kServiceTokenString}";
             return serviceNameString;
 
         }

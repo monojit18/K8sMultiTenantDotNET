@@ -112,13 +112,41 @@ namespace K8sMultiTenantOperator.Controllers
                 if (deployModel.Labels != null)
                     yamlModel.Metadata.Labels = deployModel.Labels;               
 
-                yamlModel.Spec.Replicas = deployModel.Replicas;                
+                yamlModel.Spec.Replicas = deployModel.Replicas;
                 yamlModel.Spec.Selector.MatchLabels["app"] = deployParams.Item2;
                 yamlModel.Spec.Template.Metadata.Labels["app"] = deployParams.Item2;
 
                 var container = yamlModel.Spec.Template.Spec.Containers[0];
                 container.Name = deployParams.Item3;
-                
+                container.Image = deployModel.Image;
+                container.ImagePullPolicy = deployModel.ImagePullPolicy;
+
+                if (deployModel.Resources != null)
+                {
+
+                    if (deployModel.Resources.Requests != null)
+                    {
+
+                        var cpu = new ResourceQuantity(deployModel.Resources.Requests.CPU);
+                        container.Resources.Requests["cpu"] = cpu;
+
+                        var memory = new ResourceQuantity(deployModel.Resources.Requests.Memory);
+                        container.Resources.Requests["memory"] = memory;
+
+                    }
+
+                    if (deployModel.Resources.Limits != null)
+                    {
+
+                        var cpu = new ResourceQuantity(deployModel.Resources.Limits.CPU);
+                        container.Resources.Limits["cpu"] = cpu;
+
+                        var memory = new ResourceQuantity(deployModel.Resources.Limits.Memory);
+                        container.Resources.Limits["memory"] = memory;
+
+                    }
+                }                
+
                 if (deployModel.Env != null)
                 {
 
@@ -131,7 +159,7 @@ namespace K8sMultiTenantOperator.Controllers
 
                     }
                     container.Env = v1EnvList;
-                }                    
+                }
 
                 var containerPorts = new List<V1ContainerPort>();
                 foreach (var port in deployModel.Ports)
@@ -194,7 +222,7 @@ namespace K8sMultiTenantOperator.Controllers
             var container = existingDeployment.Spec.Template.Spec.Containers[0];
             container.Name = deployParams.Item3;
 
-            if (patchModel.Env != null)
+            if (patchModel.Env.Count > 0)
             {
 
                 var v1EnvList = new List<V1EnvVar>();
@@ -208,23 +236,28 @@ namespace K8sMultiTenantOperator.Controllers
                 container.Env = v1EnvList;
             }
 
-            var containerPorts = new List<V1ContainerPort>();
-            foreach (var port in patchModel.Ports)
+            if (patchModel.Ports.Count > 0)
             {
 
-                var v1ContainerPort = new V1ContainerPort(port);
-                containerPorts.Add(v1ContainerPort);
+                var containerPorts = new List<V1ContainerPort>();
+                foreach (var port in patchModel.Ports)
+                {
+
+                    var v1ContainerPort = new V1ContainerPort(port);
+                    containerPorts.Add(v1ContainerPort);
+
+                }
+                container.Ports = containerPorts;
 
             }
-            container.Ports = containerPorts;
-
+            
             try
             {
 
                 
-                var v1Patch = new V1Patch(patchModel, V1Patch.PatchType.MergePatch);
+                var v1Patch = new V1Patch(existingDeployment, V1Patch.PatchType.MergePatch);
                 var v1Deployment = await k8sClient.PatchNamespacedDeploymentAsync
-                                                   (v1Patch, _deployName, _groupName);
+                                                   (v1Patch, deployParams.Item1, namespaceParams);
                 var deployModel = new MTADeployModel(v1Deployment);
                 return new Tuple<MTADeployModel, MTAErrorModel>(deployModel, null);
 
