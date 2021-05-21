@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  name: template-svc
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: template-deploy
+  type: ClusterIP

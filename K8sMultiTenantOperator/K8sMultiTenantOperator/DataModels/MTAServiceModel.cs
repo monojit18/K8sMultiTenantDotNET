@@ -15,11 +15,17 @@ namespace K8sMultiTenantOperator.DataModels
         public string ServiceNamespace { get; set; }
 
         [JsonProperty("ports")]
-        public string Ports { get; set; }
+        public List<PortItem> Ports { get; set; }
 
         [JsonProperty("selectors")]
-        public Dictionary<string, string> Selectors { get; set; }              
+        public Dictionary<string, string> Selectors { get; set; }
 
+        public MTAServiceModel()
+        {
+
+            Selectors = new Dictionary<string, string>();
+
+        }
 
         public MTAServiceModel(V1Service v1Service)
         {
@@ -29,5 +35,19 @@ namespace K8sMultiTenantOperator.DataModels
             Selectors = (Dictionary<string, string>)(v1Service.Spec.Selector);            
 
         }
+    }   
+
+    public class PortItem
+    {
+
+        [JsonProperty("port")]
+        public int Port { get; set; }
+
+        [JsonProperty("protocol")]
+        public string Protocol { get; set; }
+
+        [JsonProperty("targetPort")]
+        public int TargetPort { get; set; }
+
     }
 }

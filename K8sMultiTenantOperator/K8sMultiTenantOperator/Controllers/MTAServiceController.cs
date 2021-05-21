@@ -57,7 +57,7 @@ namespace K8sMultiTenantOperator.Controllers
                 var serviceParams = PrepareServiceParams(_serviceName);
 
                 var v1Service = await k8sClient.ReadNamespacedServiceAsync
-                                                (serviceParams, namespaceParams);
+                                                (serviceParams.Item1, namespaceParams);
                 var serviceModel = new MTAServiceModel(v1Service);
                 return new Tuple<MTAServiceModel, MTAErrorModel>(serviceModel, null);
 
@@ -102,18 +102,29 @@ namespace K8sMultiTenantOperator.Controllers
                 var namespaceParams = PrepareNamespaceParams(_groupName);
                 var serviceParams = PrepareServiceParams(_serviceName);
 
-                yamlModel.Metadata.Name = serviceParams;
-                yamlModel.Spec.Selector = serviceModel.Selectors;
+                yamlModel.Metadata.Name = serviceParams.Item1;
 
-                var v1ServicePorts = new List<V1ServicePort>();
-                foreach (var port in serviceModel.Ports)
+                if (serviceModel.Selectors != null)
+                    yamlModel.Spec.Selector = serviceModel.Selectors;
+                
+                 yamlModel.Spec.Selector["app"] = serviceParams.Item2;
+
+                if (serviceModel.Ports != null)
                 {
 
-                    var v1ServicePort = new V1ServicePort(port);
-                    v1ServicePorts.Add(v1ServicePort);
+                    var v1ServicePorts = new List<V1ServicePort>();
+                    foreach (var port in serviceModel.Ports)
+                    {
+
+                        var v1ServicePort = new V1ServicePort(port.Port);
+                        v1ServicePort.TargetPort = port.TargetPort;
+                        v1ServicePorts.Add(v1ServicePort);
+
+                    }
+                    yamlModel.Spec.Ports = v1ServicePorts;
 
                 }
-                yamlModel.Spec.Ports = v1ServicePorts;
+                
                 
                 var v1Service = await k8sClient.CreateNamespacedServiceAsync
                                                 (yamlModel, namespaceParams);
@@ -156,7 +167,7 @@ namespace K8sMultiTenantOperator.Controllers
                 var serviceParams = PrepareServiceParams(_serviceName);
 
                 var v1Status = await k8sClient.DeleteNamespacedServiceAsync
-                                               (serviceParams, namespaceParams);
+                                               (serviceParams.Item1, namespaceParams);
                 return null;
 
             }

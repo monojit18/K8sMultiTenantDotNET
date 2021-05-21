@@ -26,8 +26,8 @@ namespace K8sMultiTenantOperator.Controllers
         {
 
             var deployNameString = $"{deployName}-{_tenantName}{kDeployTokenString}";
-            var podNameString = $"{deployName}{kDeployTokenString}";
-            var containerNameString = $"{deployName}{kContainerTokenString}";
+            var podNameString = $"{deployName}-{_tenantName}{kPodTokenString}";
+            var containerNameString = $"{deployName}-{_tenantName}{kContainerTokenString}";
 
             return new Tuple<string, string, string>
                        (deployNameString, podNameString, containerNameString);
@@ -37,17 +37,18 @@ namespace K8sMultiTenantOperator.Controllers
         {
 
             var hpaNameString = $"{hpaName}-{_tenantName}{kHPATokenString}";
-            var deployNameString = $"{deployName}{kDeployTokenString}";
+            var deployNameString = $"{deployName}-{_tenantName}{kDeployTokenString}";
 
             return new Tuple<string, string>(deployNameString, hpaNameString);
 
         }
 
-        protected string PrepareServiceParams(string serviceName)
+        protected Tuple<string, string> PrepareServiceParams(string serviceName)
         {
 
             var serviceNameString = $"{serviceName}-{_tenantName}{kServiceTokenString}";
-            return serviceNameString;
+            var podNameString = $"{serviceName}-{_tenantName}{kPodTokenString}";
+            return new Tuple<string, string>(serviceName, podNameString);
 
         }
 

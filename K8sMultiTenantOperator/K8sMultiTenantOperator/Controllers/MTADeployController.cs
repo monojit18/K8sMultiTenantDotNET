@@ -215,9 +215,12 @@ namespace K8sMultiTenantOperator.Controllers
             var existingDeployment = await k8sClient.ReadNamespacedDeploymentAsync
                                                     (deployParams.Item1, namespaceParams);
 
-            patchModel.Image = existingDeployment.Spec.Template.Spec.Containers[0].Image;
-            patchModel.ImagePullPolicy = existingDeployment.Spec.Template.Spec.Containers[0].ImagePullPolicy;
-            patchModel.Replicas = (int)(existingDeployment.Spec.Replicas);
+            existingDeployment.Spec.Template.Spec.Containers[0].Image = patchModel.Image;
+
+            existingDeployment.Spec.Template.Spec.Containers[0].ImagePullPolicy =
+            patchModel.ImagePullPolicy;
+
+            existingDeployment.Spec.Replicas = patchModel.Replicas;
 
             var container = existingDeployment.Spec.Template.Spec.Containers[0];
             container.Name = deployParams.Item3;
