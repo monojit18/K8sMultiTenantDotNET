@@ -29,6 +29,7 @@ namespace K8sMultiTenantOperator.Controllers
         private readonly ILogger<K8sController> _logger;
         private readonly Kubernetes _k8sClient;
         private readonly KubernetesClientConfiguration _k8sConfig;
+        private readonly DnsManagementClient _dnsManagementClient1;
 
         private static string GetTemplatesPath()
         {
@@ -58,16 +59,7 @@ namespace K8sMultiTenantOperator.Controllers
             var dnsManagementClient = new DnsManagementClient(restCredentials);
             return dnsManagementClient;
 
-        }
-
-        private async Task<ContainerServiceClient> PrepareAKSClientAsync(string tenantId, string clientId, string secret)
-        {
-
-            var restCredentials = await ApplicationTokenProvider.LoginSilentAsync(tenantId, clientId, secret);
-            var aksManagementClient = new ContainerServiceClient(restCredentials);
-            return aksManagementClient;
-
-        }
+        }       
 
         public K8sController(ILogger<K8sController> logger)
         {
@@ -75,6 +67,7 @@ namespace K8sMultiTenantOperator.Controllers
             _logger = logger;
             _k8sClient = PrepareK8s().Item1;
             _k8sConfig = PrepareK8s().Item2;
+            _dnsManagementClient1 = PrepareDNSClientAsync();
 
         }
 
